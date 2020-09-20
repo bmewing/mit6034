@@ -16,7 +16,7 @@
 # the distributive law.
 
 # Your goal is to fill in the do_multiply() function so that multiplication
-# can be simplified as intended.
+# can be simplified as intended. 
 
 # Testing will be mathematical:  If you return a flat list that
 # evaluates to the same value as the original expression, you will
@@ -35,7 +35,7 @@
 # Sum([1, 2, 3])
 
 
-# Expression classes _____________________________________________________
+### Expression classes _____________________________________________________
 
 # Expressions will be represented as "Sum()" and "Product()" objects.
 # These objects can be treated just like lists (they inherit from the
@@ -49,12 +49,9 @@
 # >>> isinstance(Sum([1,2,3]), Expression) # Sums and Products are both Expressions
 # True
 
-
 class Expression:
-    """This abstract class does nothing on its own."""
-
-    def simplify(self):
-        raise NotImplementedError
+    "This abstract class does nothing on its own."
+    pass
 
 
 class Sum(list, Expression):
@@ -71,10 +68,9 @@ class Sum(list, Expression):
       * You can convert an ordinary list to a sum with the Sum() constructor:
          the_sum = Sum(the_list)
     """
-
     def __repr__(self):
         return "Sum(%s)" % list.__repr__(self)
-
+    
     def simplify(self):
         """
         This is the starting point for the task you need to perform. It
@@ -102,10 +98,9 @@ class Product(list, Expression):
     See the documentation above for Sum. A Product acts almost exactly
     like a list, and can be converted to and from a list when necessary.
     """
-
     def __repr__(self):
         return "Product(%s)" % list.__repr__(self)
-
+    
     def simplify(self):
         """
         To simplify a product, we need to multiply all its factors together
@@ -143,7 +138,6 @@ def simplify_if_possible(expr):
         return expr.simplify()
     else:
         return expr
-
 
 # You may find the following helper functions to be useful.
 # "multiply" is provided for you; but you will need to write "do_multiply"
@@ -185,4 +179,51 @@ def do_multiply(expr1, expr2):
     '*' will not help you.
     """
     # Replace this with your solution.
-    raise NotImplementedError
+    count_sums = isinstance(expr1, Sum) + isinstance(expr2, Sum)
+    if count_sums == 2:
+        res = two_sum(expr1, expr2)
+    elif count_sums == 1:
+        res = one_sum(expr1, expr2)
+    else:
+        res = no_sums(expr1, expr2)
+    if isinstance(res, (int, float)):
+        res = Sum([res])
+    return res
+
+
+def two_sum(expr1, expr2):
+    output = Sum()
+    for x in expr1:
+        for y in expr2:
+            output.append(simplify_prod(Product([x, y])))
+    return output
+
+
+def one_sum(expr1, expr2):
+    output = Sum()
+    if isinstance(expr1, Sum):  # expr1 needs to be the product
+        expr1, expr2 = expr2, expr1
+    # expand as expr1 * expr2[0] + expr1 * expr[1] + ...
+    for x in expr2:
+        if not isinstance(x, (list, tuple)):
+            x = [x]
+        output.append(simplify_prod(Product(expr1+x)))
+    return output
+
+
+def no_sums(expr1, expr2):
+    return simplify_prod(Product(expr1+expr2))
+
+
+def simplify_prod(expr):
+    output = [1]
+    for i in expr:
+        if isinstance(i, (int, float)):
+            output[0] *= i
+        else:
+            output.append(i)
+    if len(output) == 1:
+        output = output[0]
+    else:
+        output = Product(output)
+    return output

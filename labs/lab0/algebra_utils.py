@@ -4,24 +4,22 @@ Internet. You shouldn't need to mess with these.
 """
 from algebra import simplify_if_possible, Sum, Product, Expression
 
-
 def distribution(val):
     if isinstance(val, Expression):
         raise ValueError("expression has already been decoded")
     return encode_sumprod(simplify_if_possible(decode_sumprod(val)))
 
-
 def encode_sumprod(lst):
     retVal = []
 
     if isinstance(lst, Sum):
-        retVal.append("Sum")
+        retVal.append('Sum')
     elif isinstance(lst, Product):
-        retVal.append("Product")
+        retVal.append('Product')
 
     for elt in lst:
         if isinstance(elt, (Sum, Product)):
-            retVal.append(encode_sumprod(elt))
+            retVal.append( encode_sumprod(elt) )
         else:
             retVal.append(elt)
 
@@ -37,11 +35,13 @@ def decode_sumprod(lst):
         else:
             retVal.append(elt)
 
-    if lst[0] == "Sum":
+    if lst[0] == 'Sum':
         retVal = Sum(retVal)
-    elif lst[0] == "Product":
+    elif lst[0] == 'Product':
         retVal = Product(retVal)
     else:
         raise Exception("Error: List was not an encoded Sum or Product!")
-
+    
     return retVal
+
+
