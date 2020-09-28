@@ -40,7 +40,7 @@ ANSWER_1 = '2'
 ANSWER_2 = 'no'
 
 # Which rule contains a programming error? Answer '1' or '2'.
-ANSWER_3 = '1'
+ANSWER_3 = '2'
 
 # If you're uncertain of these answers, look in tests.py for an
 # explanation.
@@ -69,11 +69,11 @@ ANSWER_3 = '1'
 # what is asked.  After we start the system running, which rule
 # fires first?
 
-ANSWER_4 = 'your answer here'
+ANSWER_4 = '1'
 
 # Which rule fires second?
 
-ANSWER_5 = 'your answer here'
+ANSWER_5 = '0'
 
 
 # Problem 1.3.1: Poker hands
@@ -90,10 +90,10 @@ poker_data = ( 'two-pair beats pair',
 # which poker hands beat which, transitively. For example, it
 # should be able to deduce that a three-of-a-kind beats a pair,
 # because a three-of-a-kind beats two-pair, which beats a pair.
-transitive_rule = IF( AND(), THEN() )
+transitive_rule = IF( AND('(?x) beats (?y)', '(?y) beats (?z)'), THEN('(?x) beats (?z)') )
 
 # You can test your rule like this:
-# print(forward_chain([transitive_rule], poker_data))
+print(forward_chain([transitive_rule], poker_data))
 
 # Here's some other data sets for the rule. The tester uses
 # these, so don't change them.
@@ -111,10 +111,22 @@ TEST_RESULTS_TRANS2 = forward_chain([transitive_rule],
 # them names by assigning them to variables. This way, you'll be
 # able to refer to the rules by name and easily rearrange them if
 # you need to.
+ident = IF(OR('male (?x)', 'female (?x)'), THEN('identical (?x) (?x)'))
+sibling = IF(AND('parent (?p) (?x)', 'parent (?p) (?y)', NOT('identical (?x) (?y)')),
+              THEN('sibling (?x) (?y)'))
+brother = IF(AND('male (?x)', 'sibling (?x) (?y)', NOT('identical (?x) (?y)')), THEN('brother (?x) (?y)'))
+sister = IF(AND('female (?x)', 'sibling (?x) (?y)', NOT('identical (?x) (?y)')), THEN('sister (?x) (?y)'))
+mother = IF(AND('female (?p)', 'parent (?p) (?x)'), THEN('mother (?p) (?x)'))
+father = IF(AND('male (?p)', 'parent (?p) (?x)'), THEN('father (?p) (?x)'))
+daughter = IF(AND('female (?x)', 'parent (?p) (?x)'), THEN('daughter (?x) (?p)'))
+son = IF(AND('male (?x)', 'parent (?p) (?x)'), THEN('son (?x) (?p)'))
+cousin = IF(AND('sibling (?p) (?q)', 'parent (?p) (?x)', 'parent (?q) (?y)'), THEN('cousin (?x) (?y)'))
+grandp = IF(AND('parent (?g) (?p)', 'parent (?p) (?x)'), THEN('grandparent (?g) (?x)'))
+grandc = IF(AND('parent (?g) (?p)', 'parent (?p) (?x)'), THEN('grandchild (?x) (?g)'))
 
 # Then, put them together into a list in order, and call it
 # family_rules.
-family_rules = [ ]                    # fill me in
+family_rules = [ident, sibling, brother, sister, mother, father, daughter, son, cousin, grandp, grandc]
 
 # Some examples to try it on:
 # Note: These are used for testing, so DO NOT CHANGE
@@ -213,7 +225,7 @@ from backchain import backchain_to_goal_tree
 ##; Section 3: Survey ##
 # Please answer these questions inside the double quotes.
 
-HOW_MANY_HOURS_THIS_PSET_TOOK = ''
-WHAT_I_FOUND_INTERESTING = ''
-WHAT_I_FOUND_BORING = ''
+HOW_MANY_HOURS_THIS_PSET_TOOK = '4'
+WHAT_I_FOUND_INTERESTING = 'backward chainer'
+WHAT_I_FOUND_BORING = 'tedium of writing out rules'
 

@@ -1,6 +1,7 @@
 from production import AND, OR, NOT, PASS, FAIL, IF, THEN, \
      match, populate, simplify, variables
 from zookeeper import ZOOKEEPER_RULES
+from pprint import pprint
 
 # This function, which you need to write, takes in a hypothesis
 # that can be determined using a set of rules, and outputs a goal
@@ -14,8 +15,30 @@ from zookeeper import ZOOKEEPER_RULES
 # tested on things other than ZOOKEEPER_RULES.
 
 
+def matcher(rule, statement):
+    consequent = rule.consequent()
+    return match(consequent[0], statement) is not None
+
+
 def backchain_to_goal_tree(rules, hypothesis):
-    raise NotImplementedError
+    output = OR(hypothesis)
+    matches = [populate(r.antecedent(), match(r.consequent()[0], hypothesis)) for r in rules if matcher(r, hypothesis)]
+    if len(matches) > 0:
+        for m in matches:
+            if isinstance(m, AND):
+                to_append = AND()
+            else:
+                to_append = OR()
+            if not isinstance(m, (AND, OR)):
+                m = AND(m)
+            for a in m:
+                child_append = OR(a)
+                child_append.append(backchain_to_goal_tree(rules, a))
+                to_append.append(child_append)
+            output.append(to_append)
+    else:
+        output.append(OR())
+    return simplify(output)
 
 # Here's an example of running the backward chainer - uncomment
 # it to see it work:
